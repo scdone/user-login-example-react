@@ -1,5 +1,4 @@
 import axios from 'axios'
-// import { postgresMd5PasswordHash } from 'pg/lib/utils'
 import { useState } from 'react'
 
 function Register(props) {
@@ -27,6 +26,7 @@ function Register(props) {
             setPassword('')
             setConfirm('')
         } else {
+            props.setLoading(true)
             const body = {
                 username: username,
                 password: password
@@ -34,6 +34,8 @@ function Register(props) {
             axios.post('/auth/register', body)
                 .then((res) => {
                     props.setUser(res.data)
+                    props.setView('home')
+                    props.setLoading(false)
                 })
         }
     }
@@ -43,7 +45,6 @@ function Register(props) {
     return (
         <section>
             <h1>Register</h1>
-
             <form onSubmit={registerFront}>
                 <input placeholder='username' type='text' onChange={handleUsername}/>
                 <input placeholder='password' type='password' onChange={handlePassword} value={password}/>

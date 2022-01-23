@@ -47,10 +47,41 @@ module.exports = {
         }
 
      },
-    login: (req, res) => {
+    login: async (req, res) => {
+        try {
+            const { username, password } = req.body
+
+            const existingUser = await sequelize.query(`SELECT * FROM users 
+            WHERE username = '${username}'`)
+
+            if(!existingUser) {
+                return res.status(400).send('error logging in')
+            } 
+
+            const isAuthenticated = bcrypt.compareSync(password, existingUser[0][0].password)
+
+            if(!isAuthenticated) {
+                return res.status(400).send('error logging in')
+            }
+
+            delete existingUser[0][0].password
+
+            req.session.user = existingUser[0][0]
+
+            res.status(200).send(req.session.user)
+
+
+        } catch {
+
+        }
 
      },
     logout: (req, res) => {
-
+        try {
+            req.session.destroy()
+            res.sendStatus(200)
+        } catch (error) {
+            console.log(error)
+        }
      }
 }
